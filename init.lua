@@ -606,6 +606,14 @@ require('lazy').setup({
         -- But for many setups, the LSP (`tsserver`) will work just fine
         -- tsserver = {},
         --
+        ocamllsp = {
+          get_language_id = function(_, ftype)
+            return language_id_of[ftype]
+          end,
+          root_dir = function(fname)
+            return require('lspconfig.util').root_pattern('*.opam', 'esy.json', 'package.json', '.git', 'dune-project', 'dune-workspace', '*.ml')(fname)
+          end,
+        },
         taplo = {
           keys = {
             {
@@ -900,6 +908,11 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
+      function(_, opts)
+        if type(opts.ensure_installed) == 'table' then
+          vim.list_extend(opts.ensure_installed, { 'ocaml' })
+        end
+      end,
       ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'scala', 'rust', 'ron', 'json' },
       -- Autoinstall languages that are not installed
       auto_install = true,
